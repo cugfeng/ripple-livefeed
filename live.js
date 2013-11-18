@@ -16,14 +16,18 @@
 			currencies:    {
 				"AUD":        true,
 				"BTC":        true,
+				"BRL":        true,
+				"CAD":        true,
 				"CHF":        true,
 				"CNY":        true,
+				"DKK":        true,
 				"EUR":        true,
 				"GBP":        true,
 				"ILS":        true,
 				"JPY":        true,
 				"LTC":        false,
-				"NOK":        false,
+				"SEK":        true,
+				"NOK":        true,
 				"USD":        true
 			},
 			gateways : [{
@@ -54,12 +58,46 @@
 				name: "justcoin",
 				addresses: [{
 					address: "rJHygWcTLVpSXkowott6kzgZU6viQSVYM1",
-					currencies: ["BTC", "LTC", "NOK"]
+					currencies: ["BTC", "LTC"]
 				}]
 			},{name: "rippleisrael",
 				addresses: [{
 					address: "rNPRNzBB92BVpAhhZr4iXDTveCgV5Pofm9",
 					currencies: ["ILS", "BTC", "LTC"]
+				}]
+			},{name: "rippleunion",
+				addresses: [{
+					address: "r3ADD8kXSUKHd6zTCKfnKT3zV9EZHjzp1S",
+					currencies: ["CAD"]
+				}]
+			},{name: "ripplemoney",
+				addresses: [{
+					address: "rkH1aQbL2ajA7HUsx8VQRuL3VaEByHELm",
+					currencies: ["GBP"]
+				}]
+			},{name: "ripplefund",
+				addresses: [{
+					address: "rE7CNMbxwvTQrqSEjbcXCrqeN6EZga1ApU",
+					currencies: ["GBP"]
+				}]
+			},{name: "wisepass",
+				addresses: [{
+					address: "rPDXxSZcuVL3ZWoyU82bcde3zwvmShkRyF",
+					currencies: ["USD", "BRL", "BTC", "CAD", "CHF", "DKK", "EUR", "GBP", "JPY", "LTC", "NOK", "NOK"]
+				}]
+			},{name: "weexchange",
+				addresses: [{
+					address: "r47RkFi1Ew3LvCNKT6ufw3ZCyj5AJiLHi9",
+					currencies: ["AUD"]
+				},{
+					address: "rBcYpuDT1aXNo4jnqczWJTytKGdBGufsre",
+					currencies: ["CAD"]
+				},{
+					address: "rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi",
+					currencies: ["BTC"]
+				},{
+					address: "r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X",
+					currencies: ["USD"]
 				}]
 			}]
 		,
@@ -115,9 +153,9 @@
 				}
 			}
 		}
-		htm += '</table><div id="ledger"></div>';
-		document.getElementById("live").innerHTML = htm;
-		var css = '#live table{margin-bottom:0 !important}#live table td { font-size:12px;} #live table tr.first {font-size:13px;}table td{padding:0px 4px;overflow:hidden}.currency{width:20%;}.gateway{width:26%;}.buy{width:27%;}.sell{width:27%;}.first,.first:hover{color:white;background-color:#666}tr:hover{background-color:rgba(0,0,0,0.1)}.updated{color:black;background-color:rgba(251,225,0,0.2)}#ledger{text-align:center;}',
+		htm += '<tr class="ledger"><td></td><td>Current</td><td>ledger</td><td>?</td></tr></table>';
+		document.getElementById("ripple-livefeed").innerHTML = htm;
+		var css = '#ripple-livefeed table {margin-bottom:0!important;min-width:100%;max-width:100%;}#ripple-livefeed table td {font-size:12px;}#ripple-livefeed table tr.first {font-size:13px;}#ripple-livefeed table td {overflow:hidden;padding:0 4px;}#ripple-livefeed .currency {min-width:20%;max-width:20%;overflow:hidden;}#ripple-livefeed .gateway {min-width:26%;max-width:26%;overflow:hidden;}#ripple-livefeed .first,#ripple-livefeed .first:hover {color:#FFF;background-color:#666;}#ripple-livefeed tr:hover {background-color:rgba(0,0,0,0.1);}#ripple-livefeed .updated {color:#000;background-color:rgba(251,225,0,0.2);}#ripple-livefeed #ledger {text-align:center;}#ripple-livefeed .buy,.sell {min-width:27%;max-width:27%;overflow:hidden;}',
 			head = document.getElementsByTagName('head')[0],
 			style = document.createElement('style');
 
@@ -145,6 +183,11 @@
 			if(old3 != optionsFeed.currencyGates[cu].gateways[gw].sell){
 				entry.getElementsByTagName("td")[3].innerHTML = optionsFeed.currencyGates[cu].gateways[gw].sell;
 				updt = true;
+			}
+			if(optionsFeed.currencyGates[cu].gateways[gw].buy === "/" && optionsFeed.currencyGates[cu].gateways[gw].buy === "/"){
+				entry.style.display = "none";
+			} else {
+				entry.style.display = "";
 			}
 			if(updt){
 				entry.className = "updated";
@@ -232,10 +275,10 @@
 	}
 	
 	function ledgerListener (ledger_data) {
-		document.getElementById("ledger").innerHTML = "Current ledger : "+ ledger_data.ledger_index;
-		document.getElementById("ledger").className = "updated";
+		document.getElementsByClassName("ledger")[0].getElementsByTagName("td")[3].innerHTML = ledger_data.ledger_index;
+		document.getElementsByClassName("ledger")[0].className += " updated";
 			var tmout = setTimeout(function(){
-				document.getElementById("ledger").className = "";
+				document.getElementsByClassName("ledger")[0].className = "ledger";
 		}, 1000);
 		for (cu in optionsFeed.currencies){
 			buyXRP(cu);
