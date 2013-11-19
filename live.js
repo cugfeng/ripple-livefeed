@@ -1,18 +1,4 @@
-(function() {
-	var Remote = ripple.Remote;
-	var Amount = ripple.Amount;
-	var optionsRemote = {
-	  trusted:        true,
-	  servers: [
-		{
-			host:    's1.ripple.com',
-			port:    443,
-			secure:  true
-		}
-	  ]
-	}
-
-	var optionsFeed = {
+var optionsFeed = {
 			currencies:    {
 				"AUD":        true,
 				"BTC":        true,
@@ -85,25 +71,28 @@
 					address: "rPDXxSZcuVL3ZWoyU82bcde3zwvmShkRyF",
 					currencies: ["USD", "BRL", "BTC", "CAD", "CHF", "DKK", "EUR", "GBP", "JPY", "LTC", "NOK", "NOK"]
 				}]
-			},{name: "weexchange",
-				addresses: [{
-					address: "r47RkFi1Ew3LvCNKT6ufw3ZCyj5AJiLHi9",
-					currencies: ["AUD"]
-				},{
-					address: "rBcYpuDT1aXNo4jnqczWJTytKGdBGufsre",
-					currencies: ["CAD"]
-				},{
-					address: "rpvfJ4mR6QQAeogpXEKnuyGBx8mYCSnYZi",
-					currencies: ["BTC"]
-				},{
-					address: "r9vbV3EHvXWjSkeQ6CAcYVPGeq7TuiXY2X",
-					currencies: ["USD"]
-				}]
 			}]
 		,
 		minimumXRP : 100,
+		decimals : 3,
 		currencyGates : {}
+	};
+
+(function() {
+	var Remote = ripple.Remote;
+	var Amount = ripple.Amount;
+	var optionsRemote = {
+	  trusted:        true,
+	  servers: [
+		{
+			host:    's1.ripple.com',
+			port:    443,
+			secure:  true
+		}
+	  ]
 	}
+
+	
 
 	getOptionCurrencyGates();
 	
@@ -172,10 +161,10 @@
 	function updated(cu,gw) {
 		if(state === 'interactive' || state === 'complete') {
 			var id = cu+gw;
-			var entry = document.getElementById(id);
-			var old2 = entry.getElementsByTagName("td")[2].innerHTML;
-			var old3 = entry.getElementsByTagName("td")[3].innerHTML;
-			var updt = false;
+			var entry = document.getElementById(id),
+			pdt = false;
+			var old2 = entry.getElementsByTagName("td")[2].innerHTML,
+				old3 = entry.getElementsByTagName("td")[3].innerHTML;
 			if(old2 != optionsFeed.currencyGates[cu].gateways[gw].buy){
 				entry.getElementsByTagName("td")[2].innerHTML = optionsFeed.currencyGates[cu].gateways[gw].buy;
 				updt = true;
@@ -222,7 +211,11 @@
 							counter = parseInt(thousands);
 						}
 						var rateAmount = ammountIn.ratio_human(ammountOut);
-						var rate = rateAmount.to_human();
+						var opts = new Object;;
+						if(optionsFeed.decimals != 0){
+							opts.precision = optionsFeed.decimals
+						}
+						var rate = rateAmount.to_human(opts);
 					} else {
 						var rate = "/";
 					}
@@ -260,7 +253,11 @@
 							counter = parseInt(thousands);
 						}
 						var rateAmount = ammountOut.ratio_human(ammountIn);
-						var rate = rateAmount.to_human();
+						var opts = new Object;
+						if(optionsFeed.decimals != 0){
+							opts.precision = optionsFeed.decimals
+						}
+						var rate = rateAmount.to_human(opts);
 					} else {
 						var rate = "/";
 					}
