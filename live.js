@@ -74,7 +74,7 @@ var optionsFeed = {
 			}]
 		,
 		minimumXRP : 100,
-		decimals : 3,
+		decimals : 4,
 		currencyGates : {}
 	};
 
@@ -133,18 +133,18 @@ var optionsFeed = {
 
 	function createDom() {
 		var htm = "";
-		htm += '<table cellspacing="0" cellpadding="0" border="0"><colgroup><col class="currency"><col class="gateway"><col class="buy"><col class="sell"></colgroup>';
-		htm += '<tr class="first"><td>Currency</td><td>Gateway</td><td>Buy</td><td>Sell</td></tr>';
+		htm += '<table cellspacing="0" cellpadding="0" border="0"><colgroup><col class="currency"><col class="gateway"><col class="buy"><col class="buyarr"><col class="sell"><col class="sellarr"></colgroup>';
+		htm += '<tr class="first"><td>Currency</td><td>Gateway</td><td>Buy</td><td>↕</td><td>Sell</td><td>↕</td></tr>';
 		for (cu in optionsFeed.currencies){
 			if(optionsFeed.currencies[cu]){
 				for (gw in optionsFeed.currencyGates[cu].gateways){
-					htm += '<tr id="'+cu+gw+'"><td>'+cu+'</td><td>'+gw+'</td><td>?</td><td>?</td></tr>'
+					htm += '<tr id="'+cu+gw+'"><td>'+cu+'</td><td>'+gw+'</td><td>?</td><td></td><td>?</td><td></td></tr>'
 				}
 			}
 		}
-		htm += '<tr class="ledger"><td></td><td>Current</td><td>ledger</td><td>?</td></tr></table>';
+		htm += '<tr class="ledger"><td></td><td>Current</td><td>ledger</td><td></td><td>?</td><td></td></tr></table>';
 		document.getElementById("ripple-livefeed").innerHTML = htm;
-		var css = '#ripple-livefeed table {margin-bottom:0!important;min-width:100%;max-width:100%;}#ripple-livefeed table td {font-size:12px;}#ripple-livefeed table tr.first {font-size:13px;}#ripple-livefeed table td {overflow:hidden;padding:0 4px;}#ripple-livefeed .currency {min-width:20%;max-width:20%;overflow:hidden;}#ripple-livefeed .gateway {min-width:26%;max-width:26%;overflow:hidden;}#ripple-livefeed .first,#ripple-livefeed .first:hover {color:#FFF;background-color:#666;}#ripple-livefeed tr:hover {background-color:rgba(0,0,0,0.1);}#ripple-livefeed .updated {color:#000;background-color:rgba(251,225,0,0.2);}#ripple-livefeed #ledger {text-align:center;}#ripple-livefeed .buy,.sell {min-width:27%;max-width:27%;overflow:hidden;}',
+		var css = '#ripple-livefeed .upOffer:before{content:"↑"; color:green}#ripple-livefeed .downOffer:before{content:"↓"; color:red}#ripple-livefeed table {margin-bottom:0!important;min-width:100%;max-width:100%;}#ripple-livefeed table td {font-size:12px;}#ripple-livefeed table tr.first {font-size:13px;}#ripple-livefeed table td {overflow:hidden;padding:0 4px;}#ripple-livefeed .currency {min-width:20%;max-width:20%;overflow:hidden;}#ripple-livefeed .gateway {min-width:26%;max-width:26%;overflow:hidden;}#ripple-livefeed .first,#ripple-livefeed .first:hover {color:#FFF;background-color:#666;}#ripple-livefeed tr:hover {background-color:rgba(0,0,0,0.1);}#ripple-livefeed .updated {color:#000;background-color:rgba(251,225,0,0.2);}#ripple-livefeed #ledger {text-align:center;}#ripple-livefeed .buy,.sell {min-width:27%;max-width:27%;overflow:hidden;}',
 			head = document.getElementsByTagName('head')[0],
 			style = document.createElement('style');
 
@@ -162,15 +162,36 @@ var optionsFeed = {
 		if(state === 'interactive' || state === 'complete') {
 			var id = cu+gw;
 			var entry = document.getElementById(id),
-			pdt = false;
+			updt = false;
 			var old2 = entry.getElementsByTagName("td")[2].innerHTML,
-				old3 = entry.getElementsByTagName("td")[3].innerHTML;
+				old3 = entry.getElementsByTagName("td")[4].innerHTML;
 			if(old2 != optionsFeed.currencyGates[cu].gateways[gw].buy){
+				if (old2 === "?" || old2 === "1" || old2 === "/"){
+					var html2 = "";
+				}else if (parseFloat(old2)<parseFloat(optionsFeed.currencyGates[cu].gateways[gw].buy)){
+					var html2 = "<span class='upOffer'></span>";
+				}else if(parseFloat(old2)>parseFloat(optionsFeed.currencyGates[cu].gateways[gw].buy)){
+					var html2 = "<span class='downOffer'></span>";
+				} else {
+					var html2 = "";
+				}
 				entry.getElementsByTagName("td")[2].innerHTML = optionsFeed.currencyGates[cu].gateways[gw].buy;
+				entry.getElementsByTagName("td")[3].innerHTML = html2;
 				updt = true;
 			}
 			if(old3 != optionsFeed.currencyGates[cu].gateways[gw].sell){
-				entry.getElementsByTagName("td")[3].innerHTML = optionsFeed.currencyGates[cu].gateways[gw].sell;
+				console.log("old3 "+old3 +" sell"+ optionsFeed.currencyGates[cu].gateways[gw].sell)
+				if (old3 === "?" || old3 === "1" || old3 === "/"){
+					var html3 = "";
+				}else if (parseFloat(old3)<parseFloat(optionsFeed.currencyGates[cu].gateways[gw].sell)){
+					var html3 = "<span class='upOffer'></span>";
+				}else if(parseFloat(old3)>parseFloat(optionsFeed.currencyGates[cu].gateways[gw].sell)){
+					var html3 = "<span class='downOffer'></span>";
+				} else {
+					var html3 = "";
+				}
+				entry.getElementsByTagName("td")[4].innerHTML = optionsFeed.currencyGates[cu].gateways[gw].sell;
+				entry.getElementsByTagName("td")[5].innerHTML = html3;
 				updt = true;
 			}
 			if(optionsFeed.currencyGates[cu].gateways[gw].buy === "/" && optionsFeed.currencyGates[cu].gateways[gw].buy === "/"){
@@ -272,7 +293,7 @@ var optionsFeed = {
 	}
 	
 	function ledgerListener (ledger_data) {
-		document.getElementsByClassName("ledger")[0].getElementsByTagName("td")[3].innerHTML = ledger_data.ledger_index;
+		document.getElementsByClassName("ledger")[0].getElementsByTagName("td")[4].innerHTML = ledger_data.ledger_index;
 		document.getElementsByClassName("ledger")[0].className += " updated";
 			var tmout = setTimeout(function(){
 				document.getElementsByClassName("ledger")[0].className = "ledger";
